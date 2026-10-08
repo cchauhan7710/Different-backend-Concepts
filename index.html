@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A searchable library of backend development concepts and their example projects.">
+  <title>Backend Concepts Library</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #1c2535;
+      --muted: #647087;
+      --paper: #f5f7fb;
+      --card: #fff;
+      --line: #e3e8f1;
+      --accent: #635bdb;
+      --accent-soft: #efeeff;
+      --shadow: 0 12px 32px rgb(30 43 70 / 7%);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(ellipse at 12% 0%, #e7e8ff 0, transparent 34rem),
+        var(--paper);
+      color: var(--ink);
+      font: 16px/1.55 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    a { color: inherit; }
+
+    .shell {
+      width: min(1080px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 56px 0 48px;
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--accent);
+      font-size: .76rem;
+      font-weight: 750;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 680px;
+      margin: 0;
+      font-size: clamp(2.3rem, 6vw, 4rem);
+      letter-spacing: -.055em;
+      line-height: 1.05;
+    }
+
+    .intro {
+      max-width: 630px;
+      margin: 18px 0 30px;
+      color: var(--muted);
+      font-size: 1.08rem;
+    }
+
+    .search-panel {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      max-width: 720px;
+      padding: 9px 10px 9px 18px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+
+    .search-panel svg {
+      flex: 0 0 auto;
+      color: #7e8798;
+    }
+
+    .search-panel input {
+      width: 100%;
+      min-width: 0;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--ink);
+      font: inherit;
+    }
+
+    .search-panel input::placeholder { color: #8992a2; }
+
+    .search-panel:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgb(99 91 219 / 14%);
+    }
+
+    .search-panel button {
+      flex: 0 0 auto;
+      padding: 8px 12px;
+      border: 0;
+      border-radius: 9px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      cursor: pointer;
+      font: inherit;
+      font-size: .88rem;
+      font-weight: 650;
+    }
+
+    .search-panel button:hover { background: #e4e2ff; }
+    .search-panel button:focus-visible, a:focus-visible { outline: 3px solid #a9a5ff; outline-offset: 3px; }
+
+    .library-heading {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 8px 20px;
+      align-items: baseline;
+      margin: 34px 0 16px;
+    }
+
+    .library-heading h2 {
+      margin: 0;
+      font-size: 1.15rem;
+      letter-spacing: -.02em;
+    }
+
+    #result-count {
+      margin: 0;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      display: flex;
+      min-height: 205px;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: var(--card);
+      box-shadow: 0 4px 16px rgb(30 43 70 / 3%);
+      transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      border-color: #c9c6ff;
+      box-shadow: var(--shadow);
+    }
+
+    .card[hidden] { display: none; }
+
+    .card-top {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 13px;
+    }
+
+    .number {
+      color: #858da0;
+      font-size: .77rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+    }
+
+    .tag {
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: .72rem;
+      font-weight: 700;
+    }
+
+    .card h3 {
+      margin: 0;
+      font-size: 1.08rem;
+      letter-spacing: -.02em;
+      line-height: 1.3;
+    }
+
+    .card p {
+      margin: 9px 0 18px;
+      color: var(--muted);
+      font-size: .91rem;
+    }
+
+    .card-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: auto;
+    }
+
+    .card-links a {
+      color: var(--accent);
+      font-size: .88rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .card-links a:hover { text-decoration: underline; }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      padding: 36px 20px;
+      border: 1px dashed #cfd5e1;
+      border-radius: 15px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .empty-state[hidden] { display: none; }
+
+    footer {
+      margin-top: 32px;
+      color: var(--muted);
+      font-size: .84rem;
+    }
+
+    @media (max-width: 820px) {
+      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 560px) {
+      .shell { width: min(100% - 28px, 1080px); padding-top: 38px; }
+      .grid { grid-template-columns: 1fr; }
+      .card { min-height: 180px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <p class="eyebrow">Your quick-reference library</p>
+      <h1>Backend concepts,<br>all in one place.</h1>
+      <p class="intro">Search a topic and jump straight into its example project or notes. Keep this page handy whenever you want to revisit a concept.</p>
+      <form class="search-panel" role="search" onsubmit="return false">
+        <svg aria-hidden="true" width="21" height="21" viewBox="0 0 24 24" fill="none">
+          <circle cx="10.8" cy="10.8" r="6.8" stroke="currentColor" stroke-width="1.8"></circle>
+          <path d="m16 16 4.2 4.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+        </svg>
+        <input id="search" type="search" autocomplete="off" aria-label="Search backend concepts" placeholder="Search concepts, tools, or keywords...">
+        <button id="clear-search" type="button">Clear</button>
+      </form>
+    </header>
+
+    <section aria-labelledby="library-title">
+      <div class="library-heading">
+        <h2 id="library-title">Concept library</h2>
+        <p id="result-count" aria-live="polite"></p>
+      </div>
+      <div class="grid" id="concept-grid">
+        <article class="card" data-search="node.js file system fs files read write append delete folders">
+          <div class="card-top"><span class="number">001</span><span class="tag">Node.js</span></div>
+          <h3>File system</h3>
+          <p>Read, write, append, and manage files and folders with Node.js.</p>
+          <div class="card-links"><a href="001-fs/app.js">Open example</a></div>
+        </article>
+        <article class="card" data-search="postman api testing requests response json urlencoded">
+          <div class="card-top"><span class="number">013</span><span class="tag">API tools</span></div>
+          <h3>Postman and API requests</h3>
+          <p>Try API requests and handle JSON and form-encoded request bodies.</p>
+          <div class="card-links"><a href="0013-postman/app.js">Open example</a></div>
+        </article>
+        <article class="card" data-search="error handling errors middleware express">
+          <div class="card-top"><span class="number">014</span><span class="tag">Express</span></div>
+          <h3>Error handling</h3>
+          <p>Handle errors in an Express application.</p>
+          <div class="card-links"><a href="0014-error-handeling/app.js">Open example</a></div>
+        </article>
+        <article class="card" data-search="http protocol request response server status">
+          <div class="card-top"><span class="number">002</span><span class="tag">Web basics</span></div>
+          <h3>HTTP</h3>
+          <p>Explore HTTP requests, responses, and a Node.js server.</p>
+          <div class="card-links"><a href="002-http/app.js">Open example</a></div>
+        </article>
+        <article class="card" data-search="express routes middleware web framework">
+          <div class="card-top"><span class="number">003</span><span class="tag">Express</span></div>
+          <h3>Express basics</h3>
+          <p>Build routes and middleware with the Express framework.</p>
+          <div class="card-links"><a href="003-express/app.js">Open example</a></div>
+        </article>
+        <article class="card" data-search="express session sessions state login">
+          <div class="card-top"><span class="number">004</span><span class="tag">Express</span></div>
+          <h3>Express sessions</h3>
+          <p>Keep session state between requests in an Express app.</p>
+          <div class="card-links"><a href="004-express-session/app.js">Open example</a></div>
+        </article>
+        <article class="card" data-search="connect-flash flash messages notifications express session">
+          <div class="card-top"><span class="number">005</span><span class="tag">Express</span></div>
+          <h3>Flash messages</h3>
+          <p>Send one-time messages between requests using sessions.</p>
+          <div class="card-links"><a href="005-connect-flash/app.js">Open example</a></div>
+        </article>
+        <article class="card" data-search="cors cross-origin resource sharing browser origin">
+          <div class="card-top"><span class="number">007</span><span class="tag">Web basics</span></div>
+          <h3>CORS</h3>
+          <p>Configure cross-origin access for browser-based clients.</p>
+          <div class="card-links"><a href="007-cors/app.js">Open example</a></div>
+        </article>
+        <article class="card" data-search="cookie-parser cookies browser request">
+          <div class="card-top"><span class="number">008</span><span class="tag">Express</span></div>
+          <h3>Cookie parser</h3>
+          <p>Read cookie values from incoming requests.</p>
+          <div class="card-links"><a href="008-cookie-parser/app.js">Open example</a></div>
+        </article>
+        <article class="card" data-search="morgan logger logging http requests">
+          <div class="card-top"><span class="number">009</span><span class="tag">Express</span></div>
+          <h3>Morgan request logger</h3>
+          <p>Log HTTP requests as they pass through Express.</p>
+          <div class="card-links"><a href="009-morgan-logger/app.js">Open example</a></div>
+        </article>
+        <article class="card" data-search="dynamic routes parameters express url">
+          <div class="card-top"><span class="number">010</span><span class="tag">Express</span></div>
+          <h3>Dynamic routes</h3>
+          <p>Use route parameters to respond to variable URL paths.</p>
+          <div class="card-links"><a href="010-dynamic-routes/app.js">Open example</a></div>
+        </article>
+        <article class="card" data-search="ejs templates rendering views">
+          <div class="card-top"><span class="number">011</span><span class="tag">Templating</span></div>
+          <h3>EJS templates</h3>
+          <p>Render dynamic HTML pages with EJS templates.</p>
+          <div class="card-links"><a href="011-ejs/app.js">Open example</a></div>
+        </article>
+        <article class="card" data-search="forms form handling body parser express json urlencoded">
+          <div class="card-top"><span class="number">012</span><span class="tag">Express</span></div>
+          <h3>Form handling</h3>
+          <p>Accept and process form and JSON data in Express.</p>
+          <div class="card-links"><a href="012-form-handeling/app.js">Open example</a></div>
+        </article>
+        <article class="card" data-search="mongodb database connection">
+          <div class="card-top"><span class="number">015</span><span class="tag">MongoDB</span></div>
+          <h3>MongoDB basics</h3>
+          <p>Connect an Express application to MongoDB.</p>
+          <div class="card-links"><a href="015-mongodb/app.js">Open example</a></div>
+        </article>
+        <article class="card" data-search="mongodb crud create read update delete">
+          <div class="card-top"><span class="number">016</span><span class="tag">MongoDB</span></div>
+          <h3>MongoDB CRUD</h3>
+          <p>Create, read, update, and delete database records.</p>
+          <div class="card-links"><a href="016-mongo-crud/app.js">Open example</a></div>
+        </article>
+        <article class="card" data-search="mongodb operators queries filters">
+          <div class="card-top"><span class="number">017</span><span class="tag">MongoDB</span></div>
+          <h3>MongoDB operators</h3>
+          <p>Query and update documents with MongoDB operators.</p>
+          <div class="card-links"><a href="017-mongo-operator/app.js">Open example</a></div>
+        </article>
+        <article class="card" data-search="mongodb relationships embedded documents data modeling">
+          <div class="card-top"><span class="number">018</span><span class="tag">MongoDB</span></div>
+          <h3>MongoDB relationships</h3>
+          <p>Explore how related data can be organized in MongoDB.</p>
+          <div class="card-links"><a href="018-relationship-in-mongo/app.js">Open example</a></div>
+        </article>
+        <article class="card" data-search="mongodb referencing references objectid populate relationships">
+          <div class="card-top"><span class="number">019</span><span class="tag">MongoDB</span></div>
+          <h3>MongoDB references</h3>
+          <p>Connect documents by storing references between records.</p>
+          <div class="card-links"><a href="019-referencing-mongo/app.js">Open example</a></div>
+        </article>
+        <article class="card" data-search="mongodb relationship reference relationships">
+          <div class="card-top"><span class="number">019</span><span class="tag">MongoDB</span></div>
+          <h3>Referenced relationships</h3>
+          <p>See another example of relationships using document references.</p>
+          <div class="card-links"><a href="019-relationship-mongo-reference/app.js">Open example</a></div>
+        </article>
+        <article class="card" data-search="jwt json web token authentication bcrypt login">
+          <div class="card-top"><span class="number">020</span><span class="tag">Authentication</span></div>
+          <h3>JWT authentication</h3>
+          <p>Work with JSON Web Tokens and password hashing in an app.</p>
+          <div class="card-links"><a href="020-jwt/app.js">Open example</a></div>
+        </article>
+        <article class="card" data-search="multer upload files multipart form">
+          <div class="card-top"><span class="number">021</span><span class="tag">Files</span></div>
+          <h3>Multer uploads</h3>
+          <p>Receive uploaded files with Express and Multer.</p>
+          <div class="card-links"><a href="021-multer/app.js">Open example</a></div>
+        </article>
+        <article class="card" data-search="redis cache key value store ioredis">
+          <div class="card-top"><span class="number">022</span><span class="tag">Data &amp; caching</span></div>
+          <h3>Redis</h3>
+          <p>Explore Redis integration and the accompanying setup notes.</p>
+          <div class="card-links">
+            <a href="022-redis/app.js">Open example</a>
+            <a href="022-redis/redme.md">Read notes</a>
+          </div>
+        </article>
+        <article class="card" data-search="socket.io sockets realtime real-time events chat">
+          <div class="card-top"><span class="number">023</span><span class="tag">Real time</span></div>
+          <h3>Socket.IO</h3>
+          <p>Build real-time, two-way communication with sockets.</p>
+          <div class="card-links"><a href="023-socket/app.js">Open example</a></div>
+        </article>
+        <article class="card" data-search="razorpay payment payments checkout integration">
+          <div class="card-top"><span class="number">024</span><span class="tag">Payments</span></div>
+          <h3>Razorpay payments</h3>
+          <p>Review the payment flow example and its setup guide.</p>
+          <div class="card-links">
+            <a href="024-razorpay/app.js">Open example</a>
+            <a href="024-razorpay/readme.md">Read notes</a>
+          </div>
+        </article>
+        <article class="card" data-search="google oauth oauth2 login authentication social sign in">
+          <div class="card-top"><span class="number">025</span><span class="tag">Authentication</span></div>
+          <h3>Google OAuth</h3>
+          <p>Explore Google sign-in and its configuration notes.</p>
+          <div class="card-links">
+            <a href="025-googleoauth/app.js">Open example</a>
+            <a href="025-googleoauth/readme.md">Read notes</a>
+          </div>
+        </article>
+        <article class="card" data-search="nodemailer email mail messages">
+          <div class="card-top"><span class="number">026</span><span class="tag">Email</span></div>
+          <h3>Nodemailer</h3>
+          <p>Send email from Node.js with the example and setup notes.</p>
+          <div class="card-links">
+            <a href="026-nodemailer/app.js">Open example</a>
+            <a href="026-nodemailer/readme.md">Read notes</a>
+          </div>
+        </article>
+        <article class="card" data-search="cloudinary cloud image upload media storage">
+          <div class="card-top"><span class="number">027</span><span class="tag">Files &amp; media</span></div>
+          <h3>Cloudinary</h3>
+          <p>Open the Cloudinary lesson notes for its setup and usage.</p>
+          <div class="card-links"><a href="027-cloudnary/readme.md">Read notes</a></div>
+        </article>
+        <p class="empty-state" id="empty-state" hidden>No concepts match that search. Try a different keyword.</p>
+      </div>
+    </section>
+
+    <footer>Tip: bookmark this page, or open <code>index.html</code> from the project folder whenever you need a quick refresher.</footer>
+  </main>
+  <script>
+    const searchInput = document.querySelector("#search");
+    const clearButton = document.querySelector("#clear-search");
+    const cards = Array.from(document.querySelectorAll(".card"));
+    const resultCount = document.querySelector("#result-count");
+    const emptyState = document.querySelector("#empty-state");
+
+    function filterConcepts() {
+      const query = searchInput.value.trim().toLocaleLowerCase();
+      let visibleCount = 0;
+
+      for (const card of cards) {
+        const searchableText = `${card.textContent} ${card.dataset.search}`.toLocaleLowerCase();
+        const matches = searchableText.includes(query);
+        card.hidden = !matches;
+        if (matches) visibleCount += 1;
+      }
+
+      resultCount.textContent = `${visibleCount} of ${cards.length} concepts`;
+      emptyState.hidden = visibleCount !== 0;
+    }
+
+    searchInput.addEventListener("input", filterConcepts);
+    clearButton.addEventListener("click", () => {
+      searchInput.value = "";
+      filterConcepts();
+      searchInput.focus();
+    });
+    filterConcepts();
+  </script>
+</body>
+</html>
